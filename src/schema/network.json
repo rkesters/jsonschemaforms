@@ -1,25 +1,31 @@
 {
-	"title": "A registration form",
-	"description": "A simple form example.",
 	"type": "object",
-	"required": [
-	  "firstName",
-	  "lastName"
-	],
+	"definitions": {
+		"interface": {
+			"type": "object",
+
+			"properties": {
+				"IPV": {
+					"title": "IP Version",
+					"enum": ["IPv4", "IPv6"]
+				},
+				"address": {
+					"type": "string",
+					"format": "ipv4"
+				}
+			}
+		}
+	},
 	"properties": {
-	  "firstName": {
-		"type": "string",
-		"title": "First name",
-		"default": "Chuck"
-	  },
-	  "lastName": {
-		"type": "string",
-		"title": "Last name"
-	  },
-	  "telephone": {
-		"type": "string",
-		"title": "Telephone",
-		"minLength": 10
-	  }
-	}
-  }
+		"interfaces": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/interface" }
+		},
+		"commandAddress": {
+			"title": "Command Address",
+			"type": "string",
+			"$patch": ""
+		}
+	},
+	"required": ["interfaces", "commandAddress"]
+}
