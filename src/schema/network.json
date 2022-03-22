@@ -1,31 +1,82 @@
 {
-	"type": "object",
-	"definitions": {
-		"interface": {
-			"type": "object",
-
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "CommunicationIpVersion": {
+            "enum": [
+                "IPv4",
+				"IPv6"
+            ],
+            "type": "string"
+        },
+        "NetworkAddress": {
+            "type": "object",
 			"properties": {
-				"IPV": {
-					"title": "IP Version",
-					"enum": ["IPv4", "IPv6"]
+				"ipVersion": {
+					"$ref": "#/definitions/CommunicationIpVersion"
 				},
 				"address": {
 					"type": "string",
-					"format": "ipv4"
+					"if": {
+						"properties": { "ipVersion": { "const": "IPv4" } }
+					},
+					"then": {
+							"format": "ipv4"
+					},
+					"else": {
+						"format": "ipv6"
+					}
 				}
 			}
-		}
-	},
-	"properties": {
-		"interfaces": {
-			"type": "array",
-			"items": { "$ref": "#/definitions/interface" }
-		},
-		"commandAddress": {
-			"title": "Command Address",
-			"type": "string",
-			"$patch": ""
-		}
-	},
-	"required": ["interfaces", "commandAddress"]
+        },
+        "NetworkInterface": {
+            "additionalProperties": false,
+            "properties": {
+                "fqdn": {
+                    "format": "hostname",
+                    "type": "string"
+                },
+                "hardwareAddresse": {
+                    "pattern": "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$",
+                    "type": "string"
+                },
+                "networkAddresses": {
+                    "items": {
+                        "$ref": "#/definitions/NetworkAddress"
+                    },
+                    "minimum": 1,
+                    "type": "array"
+                }
+            },
+            "required": [
+                "hardwareAddresse",
+                "networkAddresses"
+            ],
+            "type": "object"
+        },
+        "SpectraComScanConfiguration": {
+            "additionalProperties": false,
+            "properties": {
+                "interfaces": {
+                    "items": {
+                        "$ref": "#/definitions/NetworkInterface"
+                    },
+                    "minimum": 1,
+                    "type": "array"
+                },
+				"commandAddress": {
+                    "$ref": "#/definitions/NetworkAddress"
+                },
+                "dataAddress": {
+                    "$ref": "#/definitions/NetworkAddress"
+                }
+            },
+            "required": [
+                "commandAddress",
+                "dataAddress",
+                "interfaces"
+            ],
+            "type": "object"
+        }
+    },
+	"$ref": "#/definitions/SpectraComScanConfiguration"
 }
