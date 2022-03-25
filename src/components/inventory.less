@@ -1,0 +1,30 @@
+.viewInventory {
+	composes: fullHeight from '../../app.less';
+	overflow-y: scroll;
+	background-color: white;
+}
+
+.viewInventoryContainer {
+	composes: fullHeight from '../../app.less';
+	padding: 16px;
+	background-color: white;
+}
+
+.formGroup {
+	width: 100%;
+	margin-top: 10px;
+	.formElement {
+		width: inherit;
+		margin-top: 10px;
+	}
+}
+
+.fiftyWidth {
+	width: 45%;
+}
+
+.metricTable {
+	:global .MuiTablePagination-root {
+		border-color: white;
+	}
+}
