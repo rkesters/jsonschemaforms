@@ -1,82 +1,108 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "definitions": {
-        "CommunicationIpVersion": {
-            "enum": [
-                "IPv4",
-				"IPv6"
-            ],
-            "type": "string"
-        },
-        "NetworkAddress": {
-            "type": "object",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"definitions": {
+		"CommunicationIpVersion": {
+			"enum": ["IPv4", "IPv6"],
+			"type": "string"
+		},
+		"NetworkAddressOnly": {
+			"oneOf": [
+				{ "type": "string", "format": "ipv4" },
+				{ "type": "string", "format": "ipv6" }
+			]
+		},
+		"NetworkAddress": {
+			"type": "object",
 			"properties": {
 				"ipVersion": {
 					"$ref": "#/definitions/CommunicationIpVersion"
-				},
-				"address": {
-					"type": "string",
-					"if": {
-						"properties": { "ipVersion": { "const": "IPv4" } }
-					},
-					"then": {
-							"format": "ipv4"
-					},
-					"else": {
+				}
+			},
+			"if": {
+				"properties": {
+					"ipVersion": {
+						"const": "IPv4"
+					}
+				}
+			},
+			"then": {
+				"properties": {
+					"address": {
+						"type": "string",
+						"format": "ipv4"
+					}
+				}
+			},
+			"else": {
+				"properties": {
+					"address": {
+						"type": "string",
 						"format": "ipv6"
 					}
 				}
 			}
-        },
-        "NetworkInterface": {
-            "additionalProperties": false,
-            "properties": {
-                "fqdn": {
-                    "format": "hostname",
-                    "type": "string"
-                },
-                "hardwareAddresse": {
-                    "pattern": "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$",
-                    "type": "string"
-                },
-                "networkAddresses": {
-                    "items": {
-                        "$ref": "#/definitions/NetworkAddress"
-                    },
-                    "minimum": 1,
-                    "type": "array"
-                }
-            },
-            "required": [
-                "hardwareAddresse",
-                "networkAddresses"
-            ],
-            "type": "object"
-        },
-        "SpectraComScanConfiguration": {
-            "additionalProperties": false,
-            "properties": {
-                "interfaces": {
-                    "items": {
-                        "$ref": "#/definitions/NetworkInterface"
-                    },
-                    "minimum": 1,
-                    "type": "array"
-                },
+		},
+		"NetworkInterface": {
+			"additionalProperties": false,
+			"properties": {
+				"fqdn": {
+					"format": "hostname",
+					"type": "string"
+				},
+				"hardwareAddresse": {
+					"pattern": "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$",
+					"type": "string"
+				},
+				"networkAddresses": {
+					"items": {
+						"$ref": "#/definitions/NetworkAddress"
+					},
+					"minimum": 1,
+					"type": "array"
+				}
+			},
+			"required": ["hardwareAddresse", "networkAddresses"],
+			"type": "object"
+		},
+		"SpectraComScanConfiguration": {
+			"additionalProperties": false,
+			"properties": {
+				"interfaces": {
+					"items": {
+						"$ref": "#/definitions/NetworkInterface"
+					},
+					"minimum": 1,
+					"type": "array"
+				},
 				"commandAddress": {
-                    "$ref": "#/definitions/NetworkAddress"
-                },
-                "dataAddress": {
-                    "$ref": "#/definitions/NetworkAddress"
-                }
-            },
-            "required": [
-                "commandAddress",
-                "dataAddress",
-                "interfaces"
-            ],
-            "type": "object"
-        }
-    },
-	"$ref": "#/definitions/SpectraComScanConfiguration"
+					"type": "string",
+					"anyOf": [{ "format": "ipv4" }, { "format": "ipv6" }]
+				},
+				"dataAddress": {
+					"type": "string",
+					"anyOf": [{ "format": "ipv4" }, { "format": "ipv6" }]
+				}
+			},
+			"type": "object"
+		}
+	},
+	"additionalProperties": false,
+	"properties": {
+		"interfaces": {
+			"items": {
+				"$ref": "#/definitions/NetworkInterface"
+			},
+			"minimum": 1,
+			"type": "array"
+		},
+		"commandAddress": {
+			"type": "string",
+			"oneOf": [{ "format": "ipv4" }, { "format": "ipv6" }]
+		},
+		"dataAddress": {
+			"type": "string",
+			"anyOf": [{ "format": "ipv4" }, { "format": "ipv6" }]
+		}
+	},
+	"type": "object"
 }
