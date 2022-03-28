@@ -3,7 +3,6 @@ declare namespace InventoryLessNamespace {
 		add: string;
 		editable: string;
 		fiftyWidth: string;
-		form: string;
 		formElement: string;
 		formGroup: string;
 		metricTable: string;

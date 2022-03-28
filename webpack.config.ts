@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/default
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import * as path from 'path';
@@ -67,10 +68,6 @@ const config  = {
 				exclude: /node_modules/,
 			},
 			{
-				test: /\.(woff|woff2|eot|ttf|svg|png|jpg|jpeg|gif)$/,
-				type: 'asset/resource',
-			},
-			{
 				test: /\.js$/,
 				// exclude some modules that cause warnings because of missing sourcemaps
 				exclude: /(rrule|react-double-scrollbar)/,
@@ -94,28 +91,28 @@ const config  = {
 		filename: '[name].bundle.js',
 		path: path.resolve(__dirname, 'dist'),
 		publicPath: '/',
-		assetModuleFilename: 'assets/[name][ext][query]',
+//		assetModuleFilename: 'assets/[name][ext][query]',
 		clean: true,
 	},
-	// plugins: [
-	// 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	// 	new ProgressBarPlugin() ,
-	// 	new HtmlWebpackPlugin({
-	// 		// Also generate a test.html
-	// 		template: 'src/index.html',
-	// 		showErrors: true,
-	// 	}),
-	// 	new CopyWebpackPlugin({
-	// 		patterns: [
-	// 			{
-	// 				from: path.resolve(__dirname, 'src/assets'),
-	// 				to: 'assets',
-	// 			},
-	// 		],
-	// 	}),
-	// 	new webpack.WatchIgnorePlugin({ paths: [/less\.d\.ts$/] }),
-	// 	new webpack.EnvironmentPlugin({ NODE_ENV: process.env.WEBPACK_MODE ?? 'development', DEBUG: false }),
-	// ],
+	plugins: [
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		new ProgressBarPlugin() ,
+		new HtmlWebpackPlugin({
+			// Also generate a test.html
+			template: 'public/index.html',
+			showErrors: true,
+		}),
+		// new CopyWebpackPlugin({
+		// 	patterns: [
+		// 		{
+		// 			from: path.resolve(__dirname, 'src/assets'),
+		// 			to: 'assets',
+		// 		},
+		// 	],
+		// }),
+		new webpack.WatchIgnorePlugin({ paths: [/less\.d\.ts$/] }),
+		new webpack.EnvironmentPlugin({ NODE_ENV: process.env.WEBPACK_MODE ?? 'development', DEBUG: false }),
+	],
 };
 
 export default config;

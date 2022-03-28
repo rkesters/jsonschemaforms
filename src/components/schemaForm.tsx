@@ -31,6 +31,7 @@ export function SchemaForm(): JSX.Element {
 	return (
 		<div style={{ width: '50%' }}>
 			<Form
+				liveValidate
 				ArrayFieldTemplate={MetricTable}
 				schema={Network}
 				formData={data}
