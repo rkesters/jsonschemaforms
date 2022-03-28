@@ -1,11 +1,13 @@
 declare namespace InventoryLessNamespace {
 	export interface IInventoryLess {
+		add: string;
+		editable: string;
 		fiftyWidth: string;
+		form: string;
 		formElement: string;
 		formGroup: string;
 		metricTable: string;
-		viewInventory: string;
-		viewInventoryContainer: string;
+		tableForm: string;
 	}
 }
 

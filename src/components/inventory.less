@@ -1,14 +1,3 @@
-.viewInventory {
-	composes: fullHeight from '../../app.less';
-	overflow-y: scroll;
-	background-color: white;
-}
-
-.viewInventoryContainer {
-	composes: fullHeight from '../../app.less';
-	padding: 16px;
-	background-color: white;
-}
 
 .formGroup {
 	width: 100%;
@@ -26,5 +15,14 @@
 .metricTable {
 	:global .MuiTablePagination-root {
 		border-color: white;
+	}
+}
+
+#tableForm.editable {
+	.form {
+		display: none;
+		.add {
+			display: block;
+		}
 	}
 }
