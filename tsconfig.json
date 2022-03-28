@@ -16,5 +16,6 @@
 		"declaration": false,
 		"declarationMap": false
 	},
-	"exclude": ["./src", "./test"]
+	"include": ["./src"],
+	"exclude": [ "./test"]
 }
