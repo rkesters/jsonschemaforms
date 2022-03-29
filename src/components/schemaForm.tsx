@@ -9,13 +9,19 @@ import { JSONSchema7 } from 'json-schema';
 import { useState } from 'react';
 import * as patch from 'fast-json-patch';
 import { diff } from 'jsondiffpatch';
-import { MetricTable } from './mertricTable';
+import { ArrayField, MetricTable } from './mertricTable';
+import { set } from 'lodash';
 
 const Network: JSONSchema7 = network as JSONSchema7;
 console.dir(Network);
 
 function patchSchema(schema: JSONSchema7, data: any) {
 	return patch.applyPatch(data, []).newDocument;
+}
+
+function idSchemaToPath(idSchema: string): string[] {
+	const parts = idSchema.split('_');
+	return parts.splice(1);
 }
 
 export function SchemaForm(): JSX.Element {
@@ -26,13 +32,22 @@ export function SchemaForm(): JSX.Element {
 		patchSchema(event.schema, event.formData);
 		setFormData(event.formData);
 	};
-
-
+	const setData = (d: any, idSchema: string, ...rest: any[]) => {
+		const path = idSchemaToPath(idSchema);
+		console.group('setData');
+		console.dir(rest);
+		console.dir(d);
+		setFormData(set(data, path, d));
+	};
+	const idPrefix = 'root';
 	return (
 		<div style={{ width: '50%' }}>
 			<Form
+				idPrefix={idPrefix}
+				formContext={{ setFormData: setData, idPrefix }}
 				liveValidate
 				ArrayFieldTemplate={MetricTable}
+				fields={{ArrayField}}
 				schema={Network}
 				formData={data}
 				onChange={onChange}

@@ -6,19 +6,55 @@ import {
 	JSONSchema7Definition,
 	JSONSchema7TypeName,
 } from 'json-schema';
-import { ArrayFieldTemplateProps, IChangeEvent } from '@rjsf/core';
+import { withTheme, ArrayFieldTemplateProps, FieldProps } from '@rjsf/core';
 import { get as getByPointer } from 'pointer-props';
 import { Add, Save, Close, Delete } from '@mui/icons-material';
 import * as css from './inventory.less';
+import { Theme5 as Mui5Theme } from '@rjsf/material-ui';
 
-export type MetricTableProps = {
-	data: any[];
-	isEditing: boolean;
-	selection: Partial<any> | undefined;
-	setSelection: React.Dispatch<React.SetStateAction<Partial<any> | undefined>>;
-	onDeleteMetric: (metricToDelete: any) => void;
-	schema: JSONSchema7;
-};
+const Form = withTheme(Mui5Theme);
+export function ArrayField(props: FieldProps) {
+	console.group('ArrayField');
+	console.dir(props);
+	console.groupEnd();
+	return (
+		<div id="af">
+			<MetricTable
+				onSaved={(data: any) => {
+					props.onChange(data);
+				}}
+				idSchema={props.idSchema}
+				formData={props.formData}
+				formContext={props.formContext}
+				schema={props.schema}
+				readonly={props.readonly}
+				disabled={props.disabled}
+				registry={props.registry}
+				uiSchema={props.uiSchema}
+				title={props.title}
+				id={props.name}
+				key={props.name}
+			></MetricTable>
+		</div>
+	);
+}
+
+export interface MetricTableProps
+	extends Pick<
+		ArrayFieldTemplateProps<any[]>,
+		| 'uiSchema'
+		| 'title'
+		| 'idSchema'
+		| 'formData'
+		| 'schema'
+		| 'readonly'
+		| 'disabled'
+		| 'registry'
+		| 'formContext'
+	> {
+	id: string;
+	onSaved: (data: any) => void;
+}
 
 function hasRef(value: unknown): value is { $ref: string } {
 	return has(value, '$ref');
@@ -37,7 +73,23 @@ function getDefiniton(
 	items: JSONSchema7Definition[] | JSONSchema7Definition | undefined,
 	registry: any,
 ): JSONSchema7 {
-	return hasRef(items) ? getByPointer(registry.rootSchema, items.$ref) : items;
+	const props: JSONSchema7 = hasRef(items)
+		? getByPointer(registry.rootSchema, items.$ref)
+		: items;
+	const out: JSONSchema7 = {
+		...props,
+	};
+	if (has(props.properties, 'if')) {
+		out.properties = {
+			...out.properties,
+			...((out.then as any) ?? {}),
+			...((out.else as any) ?? {}),
+		};
+		delete out.properties?.if;
+		delete out.properties?.then;
+		delete out.properties?.else;
+	}
+	return out;
 }
 
 export function MetricTable({
@@ -47,10 +99,14 @@ export function MetricTable({
 	readonly,
 	disabled,
 	registry,
-	...rest
-}: ArrayFieldTemplateProps<any[]>): React.ReactElement {
-	const data: any[] = formData;
+	title,
+	uiSchema,
+	id,
+	onSaved,
+}: MetricTableProps): React.ReactElement {
+	const data: any[] = formData ?? [];
 	//const id = idSchema.$id;
+	console.dir(registry);
 	const ref = hasRef(schema.items) ? schema.items.$ref : null;
 	const sub: JSONSchema7 = ref
 		? getByPointer(registry.rootSchema, ref)
@@ -65,10 +121,11 @@ export function MetricTable({
 				case 'object':
 					return map<Record<string, JSONSchema7>, Column<any> | undefined>(
 						sub.properties as Record<string, JSONSchema7>,
-						(prop: JSONSchema7, key) => {
-							if (isBoolean(prop)) {
+						(props: JSONSchema7, key) => {
+							if (isBoolean(props)) {
 								return;
 							}
+							const prop = getDefiniton(props, registry);
 							switch (prop.type) {
 								case 'array':
 									return {
@@ -117,7 +174,7 @@ export function MetricTable({
 		return (f() ?? []).filter((k): k is Column<any> => {
 			return !!k;
 		});
-	}, [sub]);
+	}, [sub, registry]);
 
 	const actions: Action<any>[] = [
 		{
@@ -146,6 +203,7 @@ export function MetricTable({
 	const [fields, setFields] = useState({});
 	const onSave = () => {
 		data.push(fields);
+		onSaved(data)
 		setFields({});
 		setAdding(false);
 	};
@@ -154,8 +212,9 @@ export function MetricTable({
 	};
 
 	return (
-		<div>
+		<div id={id}>
 			<MaterialTable
+				key="MTC"
 				columns={header}
 				data={data}
 				actions={actions}
@@ -194,9 +253,10 @@ export function MetricTable({
 						<Close onClick={onClose}></Close>
 					</div>
 					<Widget
+						liveValidate
 						idSchema={idSchema}
 						schema={sub}
-						uiSchema={{ ...rest.uiSchema, classNames: undefined }}
+						uiSchema={{ ...uiSchema, classNames: undefined }}
 						disabled={disabled}
 						readonly={readonly}
 						hideError={false}
@@ -206,14 +266,13 @@ export function MetricTable({
 						rawErrors={{}}
 						formData={fields}
 						onChange={(data: any) => {
-							console.log(`'onChnage' ${JSON.stringify(data, null, 2)}`);
 							setFields(data);
 						}}
 						onBlur={noop}
 						onFocus={noop}
 						required={false}
 						registry={registry}
-						name={rest.title}
+						name={title}
 						title={''}
 					>
 						<React.Fragment> </React.Fragment>
