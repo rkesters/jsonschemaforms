@@ -203,7 +203,7 @@ export function MetricTable({
 	const [fields, setFields] = useState({});
 	const onSave = () => {
 		data.push(fields);
-		onSaved(data)
+		onSaved(data);
 		setFields({});
 		setAdding(false);
 	};
@@ -252,31 +252,22 @@ export function MetricTable({
 						<Save onClick={onSave}> </Save>
 						<Close onClick={onClose}></Close>
 					</div>
-					<Widget
+					<Form
 						liveValidate
-						idSchema={idSchema}
-						schema={sub}
-						uiSchema={{ ...uiSchema, classNames: undefined }}
-						disabled={disabled}
-						readonly={readonly}
-						hideError={false}
-						autofocus={true}
-						errorSchema={{}}
-						formContext={null}
-						rawErrors={{}}
+						ArrayFieldTemplate={MetricTable}
+						fields={{ ArrayField }}
+						schema={{...sub, definitions: registry.rootSchema.definitions}}
 						formData={fields}
-						onChange={(data: any) => {
-							setFields(data);
+						onChange={(value: any) => {
+							console.dir(value);
 						}}
-						onBlur={noop}
-						onFocus={noop}
-						required={false}
+						onBlur={(id: string, value: any) => {
+							console.log(`${id} : ${value}`);
+						}}
 						registry={registry}
-						name={title}
-						title={''}
 					>
 						<React.Fragment> </React.Fragment>
-					</Widget>
+					</Form>
 				</div>
 			</div>
 		</div>
